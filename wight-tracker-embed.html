@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weight Tracker</title>
     <style>
-        /* Reset de estilos para el iframe */
         body {
             margin: 0;
             padding: 0;
@@ -70,6 +69,26 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+
+        .reset-container {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .reset-button {
+            background: none;
+            border: none;
+            color: #ef4444;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 5px;
+            width: auto;
+            height: auto;
+        }
+
+        .reset-button:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -85,11 +104,16 @@
             <button onclick="decrease()" id="decrease-btn" disabled>-</button>
             <button onclick="increase()" id="increase-btn">+</button>
         </div>
+        <div class="reset-container">
+            <button onclick="resetProgress()" class="reset-button">Reiniciar progreso</button>
+        </div>
     </div>
 
     <script>
-        let weight = 0;
         const maxWeight = 60;
+        // Usar un identificador único para el localStorage
+        const STORAGE_KEY = 'weight_tracker_' + window.location.pathname;
+        let weight = parseInt(localStorage.getItem(STORAGE_KEY)) || 0;
         
         function update() {
             const percentage = (weight / maxWeight) * 100;
@@ -98,6 +122,9 @@
             document.getElementById('progress-bar').style.width = percentage + '%';
             document.getElementById('decrease-btn').disabled = weight === 0;
             document.getElementById('increase-btn').disabled = weight === maxWeight;
+            
+            // Guardar en localStorage con el identificador único
+            localStorage.setItem(STORAGE_KEY, weight.toString());
         }
         
         function increase() {
@@ -113,6 +140,16 @@
                 update();
             }
         }
+
+        function resetProgress() {
+            if (confirm('¿Estás seguro de que quieres reiniciar el progreso?')) {
+                weight = 0;
+                update();
+            }
+        }
+
+        // Inicializar con el valor guardado
+        window.onload = update;
     </script>
 </body>
 </html>
