@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracker de Objetivos</title> <!-- Cambia este título según lo que estés midiendo -->
+    <style>
+        /* Estilos del contenedor y barra de progreso */
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            overflow: hidden;
+        }
+
+        .weight-tracker { /* Clase principal del tracker */
+            font-family: system-ui, sans-serif;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .weight-info { /* Estilos de la barra de progreso y porcentaje */
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .progress-container {
+            background: #e5e7eb;
+            border-radius: 999px;
+            height: 20px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        #progress-bar {
+            background: #3b82f6; /* Cambia el color de la barra aquí */
+            height: 100%;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        button {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover:not(:disabled) {
+            background: #e2e8f0;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .reset-container {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .reset-button {
+            background: none;
+            border: none;
+            color: #ef4444;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 5px;
+            width: auto;
+            height: auto;
+        }
+
+        .reset-button:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="weight-tracker">
+        <div class="weight-info">
+            <!-- Cambia "Dinero" a lo que quieras medir, por ejemplo "Tiempo", "Kilómetros", etc. -->
+            <span>Dinero: <span id="weight-value">$0</span></span>
+            <span id="percentage">0%</span> <!-- Muestra el porcentaje alcanzado de la meta -->
+        </div>
+        <div class="progress-container">
+            <div id="progress-bar"></div> <!-- Barra de progreso visual -->
+        </div>
+        <div class="button-container">
+            <!-- Botones para aumentar y disminuir el valor medido -->
+            <button onclick="decrease()" id="decrease-btn" disabled>-</button>
+            <button onclick="increase()" id="increase-btn">+</button>
+        </div>
+        <div class="reset-container">
+            <button onclick="resetProgress()" class="reset-button">Reiniciar progreso</button>
+        </div>
+    </div>
+
+    <script>
+        const maxWeight = 500; // Establece aquí el valor máximo de la meta, por ejemplo 300 dólares
+        const STORAGE_KEY = 'tracker_' + window.location.pathname; // Identificador único para guardar datos en localStorage
+        let weight = parseInt(localStorage.getItem(STORAGE_KEY)) || 0; // Carga el valor guardado en localStorage o empieza en 0
+        
+        // Función que actualiza la visualización del progreso
+        function update() {
+            const percentage = (weight / maxWeight) * 100; // Calcula el porcentaje basado en la meta
+            document.getElementById('weight-value').textContent = `$${weight}`; // Actualiza el texto del valor actual medido
+            document.getElementById('percentage').textContent = percentage.toFixed(1) + '%'; // Actualiza el porcentaje mostrado
+            document.getElementById('progress-bar').style.width = percentage + '%'; // Ajusta el ancho de la barra de progreso
+            document.getElementById('decrease-btn').disabled = weight === 0; // Deshabilita botón de reducir en 0
+            document.getElementById('increase-btn').disabled = weight === maxWeight; // Deshabilita botón de aumentar al llegar a la meta
+            localStorage.setItem(STORAGE_KEY, weight.toString()); // Guarda el progreso en localStorage
+        }
+        
+        // Función para aumentar el valor
+        function increase() {
+            if (weight < maxWeight) { // Solo incrementa si no se ha alcanzado la meta
+                weight++;
+                update();
+            }
+        }
+        
+        // Función para reducir el valor
+        function decrease() {
+            if (weight > 0) { // Solo reduce si el valor actual es mayor a 0
+                weight--;
+                update();
+            }
+        }
+
+        // Función para reiniciar el progreso a 0
+        function resetProgress() {
+            if (confirm('¿Estás seguro de que quieres reiniciar el progreso?')) { // Confirmación para reiniciar
+                weight = 0;
+                update();
+            }
+        }
+
+        // Inicializa con el valor guardado en localStorage cuando se carga la página
+        window.onload = update;
+    </script>
+</body>
+</html>
